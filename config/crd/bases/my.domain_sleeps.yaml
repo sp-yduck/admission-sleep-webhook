@@ -39,9 +39,19 @@ spec:
           spec:
             description: SleepSpec defines the desired state of Sleep.
             properties:
-              foo:
-                description: Foo is an example field of Sleep. Edit sleep_types.go
-                  to remove/update
+              mutatingDuration:
+                default: 0s
+                description: |-
+                  duration to sleep in the mutating webhook.
+                  Example: "5s", "1m", "2h".
+                pattern: ^([0-9]+[smh])+$
+                type: string
+              validatingDuration:
+                default: 0s
+                description: |-
+                  duration to sleep in the validating webhook.
+                  Example: "5s", "1m", "2h".
+                pattern: ^([0-9]+[smh])+$
                 type: string
             type: object
           status:

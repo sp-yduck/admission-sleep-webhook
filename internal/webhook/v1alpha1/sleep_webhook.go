@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -65,7 +66,13 @@ func (d *SleepCustomDefaulter) Default(_ context.Context, obj runtime.Object) er
 	}
 	sleeplog.Info("Defaulting for Sleep", "name", sleep.GetName())
 
-	// TODO(user): fill in your defaulting logic.
+	duration, err := time.ParseDuration(sleep.Spec.MutatingDuration)
+	if err != nil {
+		return fmt.Errorf("invalid duration format: %w", err)
+	}
+
+	sleeplog.Info("Sleeping in mutating webhook", "duration", duration.String())
+	time.Sleep(duration)
 
 	return nil
 }
@@ -94,7 +101,19 @@ func (v *SleepCustomValidator) ValidateCreate(_ context.Context, obj runtime.Obj
 	}
 	sleeplog.Info("Validation for Sleep upon creation", "name", sleep.GetName())
 
-	// TODO(user): fill in your validation logic upon object creation.
+	// Validate the format of validatingDuration and mutatingDuration.
+	validatingDuration, err := time.ParseDuration(sleep.Spec.ValidatingDuration)
+	if err != nil {
+		return admission.Warnings{fmt.Sprintf("invalid format for validatingDuration: %v", err)}, nil
+	}
+	_, err = time.ParseDuration(sleep.Spec.MutatingDuration)
+	if err != nil {
+		return admission.Warnings{fmt.Sprintf("invalid format for mutatingDuration: %v", err)}, nil
+	}
+
+	// Sleep for the specified validating duration.
+	sleeplog.Info("Sleeping in validating webhook", "duration", validatingDuration.String())
+	time.Sleep(validatingDuration)
 
 	return nil, nil
 }

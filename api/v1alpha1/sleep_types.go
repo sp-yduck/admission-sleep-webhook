@@ -28,8 +28,19 @@ type SleepSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Sleep. Edit sleep_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// duration to sleep in the mutating webhook.
+	// Example: "5s", "1m", "2h".
+	// +optional
+	// +kubebuilder:validation:Pattern=`^([0-9]+[smh])+$`
+	// +kubebuilder:default="0s"
+	MutatingDuration string `json:"mutatingDuration,omitempty"`
+
+	// duration to sleep in the validating webhook.
+	// Example: "5s", "1m", "2h".
+	// +optional
+	// +kubebuilder:validation:Pattern=`^([0-9]+[smh])+$`
+	// +kubebuilder:default="0s"
+	ValidatingDuration string `json:"validatingDuration,omitempty"`
 }
 
 // SleepStatus defines the observed state of Sleep.
